@@ -30,6 +30,7 @@
       background: var(--lime); color: #111; font-weight: bold;
       cursor: pointer; margin: 4px 4px 4px 0;
     }
+    button:disabled { opacity: .5; cursor: wait; }
     button.secondary { background: #333; color: white; }
     button.danger { background: #a72d2d; color: white; }
     .product {
@@ -40,6 +41,12 @@
     .muted { color: #aaa; font-size: 14px; }
     #status { white-space: pre-wrap; color: var(--lime); }
     [hidden] { display: none !important; }
+    .photo-field {
+      background: #151515; border: 1px solid #353535;
+      padding: 12px; border-radius: 10px; margin: 12px 0;
+    }
+    .photo-field input { margin-bottom: 0; }
+    .photo-field label { display: block; }
   </style>
 </head>
 <body>
@@ -81,8 +88,36 @@
         <label for="description">Description</label>
         <textarea id="description" rows="3" maxlength="2000"></textarea>
 
-        <label for="image_url">Lien HTTPS de la photo</label>
-        <input id="image_url" type="url" placeholder="https://...">
+        <h3>Photos du vêtement (6 maximum)</h3>
+        <p class="muted">
+          Colle un lien HTTPS direct vers chaque photo.
+          Tu peux laisser les champs inutilisés vides.
+        </p>
+
+        <div class="photo-field">
+          <label for="image1">Photo 1 — principale</label>
+          <input id="image1" type="url" placeholder="https://...">
+        </div>
+        <div class="photo-field">
+          <label for="image2">Photo 2</label>
+          <input id="image2" type="url" placeholder="https://...">
+        </div>
+        <div class="photo-field">
+          <label for="image3">Photo 3</label>
+          <input id="image3" type="url" placeholder="https://...">
+        </div>
+        <div class="photo-field">
+          <label for="image4">Photo 4</label>
+          <input id="image4" type="url" placeholder="https://...">
+        </div>
+        <div class="photo-field">
+          <label for="image5">Photo 5</label>
+          <input id="image5" type="url" placeholder="https://...">
+        </div>
+        <div class="photo-field">
+          <label for="image6">Photo 6</label>
+          <input id="image6" type="url" placeholder="https://...">
+        </div>
 
         <label for="vinted_url">Lien de l’annonce Vinted *</label>
         <input id="vinted_url" type="url"
@@ -108,13 +143,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Ces deux valeurs sont publiques. La sécurité repose sur RLS
-  // et sur la vérification de l'identité côté Supabase.
   const SUPABASE_URL = "https://csoxnglijidvbxgipfrp.supabase.co";
   const SUPABASE_KEY = "sb_publishable_uEffqBfs4vhslcTCv8A48w_iEu8iaqe";
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = id => document.getElementById(id);
+  const photoIds = ["image1", "image2", "image3", "image4", "image5", "image6"];
   let editingId = null;
 
   function message(text) {
@@ -140,11 +174,13 @@
 
   async function checkSession() {
     const { data, error } = await db.auth.getSession();
+
     if (error) {
       message("Erreur de connexion : " + error.message);
       showLogin();
       return;
     }
+
     if (data.session) {
       showDashboard();
       await loadProducts();
@@ -188,18 +224,23 @@
     event.preventDefault();
 
     const vinted = $("vinted_url").value.trim();
-    const image = $("image_url").value.trim();
+    const images = photoIds
+      .map(id => $(id).value.trim())
+      .filter(Boolean);
 
     try {
       const vintedURL = new URL(vinted);
+
       if (vintedURL.protocol !== "https:" ||
           vintedURL.hostname !== "www.vinted.fr") {
         throw new Error("Le lien doit être une URL HTTPS de www.vinted.fr.");
       }
-      if (image) {
+
+      for (const image of images) {
         const imageURL = new URL(image);
+
         if (imageURL.protocol !== "https:") {
-          throw new Error("Le lien de la photo doit utiliser HTTPS.");
+          throw new Error("Tous les liens des photos doivent utiliser HTTPS.");
         }
       }
     } catch (error) {
@@ -213,11 +254,18 @@
       size: $("size").value.trim(),
       condition: $("condition").value.trim(),
       description: $("description").value.trim(),
-      image_url: image,
+
+      // Nouvelle colonne : toutes les photos
+      image_urls: images,
+
+      // Ancienne colonne conservée pour compatibilité
+      image_url: images[0] || "",
+
       vinted_url: vinted
     };
 
-    if (!item.name || !Number.isFinite(item.price) || item.price < 0) {
+    if (!item.name || !Number.isFinite(item.price) ||
+        item.price < 0 || item.price > 999999) {
       message("Vérifie le nom et le prix.");
       return;
     }
@@ -225,25 +273,30 @@
     $("saveButton").disabled = true;
     message("Enregistrement…");
 
-    let result;
-    if (editingId) {
-      result = await db.from("products")
-        .update({ ...item, updated_at: new Date().toISOString() })
-        .eq("id", editingId);
-    } else {
-      result = await db.from("products").insert(item);
+    try {
+      let result;
+
+      if (editingId) {
+        result = await db.from("products")
+          .update({ ...item, updated_at: new Date().toISOString() })
+          .eq("id", editingId);
+      } else {
+        result = await db.from("products").insert(item);
+      }
+
+      if (result.error) {
+        message("Erreur : " + result.error.message);
+        return;
+      }
+
+      resetForm();
+      message("Article enregistré avec succès !");
+      await loadProducts();
+    } catch (error) {
+      message("Erreur pendant l’enregistrement. Réessaie.");
+    } finally {
+      $("saveButton").disabled = false;
     }
-
-    $("saveButton").disabled = false;
-
-    if (result.error) {
-      message("Erreur : " + result.error.message);
-      return;
-    }
-
-    resetForm();
-    message("Article enregistré !");
-    await loadProducts();
   });
 
   async function loadProducts() {
@@ -266,18 +319,22 @@
     data.forEach(item => {
       const div = document.createElement("div");
       div.className = "product";
+
+      // Prend en compte les anciens articles avec une seule photo.
+      const images = Array.isArray(item.image_urls) && item.image_urls.length
+        ? item.image_urls
+        : (item.image_url ? [item.image_url] : []);
+
       div.innerHTML = `
         <strong>${safeText(item.name)}</strong>
         <p>${Number(item.price).toFixed(2)} € ·
           Taille : ${safeText(item.size || "Non précisée")}</p>
         <p class="muted">${safeText(item.condition || "")}</p>
-        <button class="secondary" data-edit="${safeText(item.id)}">
-          Modifier
-        </button>
-        <button class="danger" data-delete="${safeText(item.id)}">
-          Supprimer
-        </button>
+        <p class="muted">${images.length} photo(s) enregistrée(s)</p>
+        <button class="secondary" data-edit>Modifier</button>
+        <button class="danger" data-delete>Supprimer</button>
       `;
+
       $("products").appendChild(div);
 
       div.querySelector("[data-edit]").addEventListener("click", () => {
@@ -287,8 +344,13 @@
         $("size").value = item.size || "";
         $("condition").value = item.condition || "";
         $("description").value = item.description || "";
-        $("image_url").value = item.image_url || "";
         $("vinted_url").value = item.vinted_url || "";
+
+        // Recharge les photos existantes dans les six champs.
+        photoIds.forEach((id, index) => {
+          $(id).value = images[index] || "";
+        });
+
         $("formTitle").textContent = "Modifier l’article";
         $("saveButton").textContent = "Enregistrer les changements";
         $("cancelButton").hidden = false;
@@ -306,6 +368,8 @@
           return;
         }
 
+        if (editingId === item.id) resetForm();
+
         message("Article supprimé.");
         await loadProducts();
       });
@@ -320,9 +384,7 @@
   });
 
   db.auth.onAuthStateChange((_event, session) => {
-    if (!session) {
-      showLogin();
-    }
+    if (!session) showLogin();
   });
 
   checkSession();
