@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administration | Ksko Shop</title>
+  <style>
+    :root { color-scheme: dark; --lime: #d7ff3f; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px; background: #101010; color: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+    main { max-width: 850px; margin: auto; }
+    h1, h2 { letter-spacing: -1px; }
+    h1 span { color: var(--lime); }
+    .panel {
+      background: #1b1b1b; border: 1px solid #353535;
+      border-radius: 16px; padding: 20px; margin: 18px 0;
+    }
+    input, textarea {
+      width: 100%; padding: 12px; margin: 6px 0 14px;
+      background: #101010; color: white; border: 1px solid #454545;
+      border-radius: 8px; font: inherit;
+    }
+    label { font-size: 14px; color: #ccc; }
+    button {
+      padding: 11px 15px; border: 0; border-radius: 8px;
+      background: var(--lime); color: #111; font-weight: bold;
+      cursor: pointer; margin: 4px 4px 4px 0;
+    }
+    button.secondary { background: #333; color: white; }
+    button.danger { background: #a72d2d; color: white; }
+    .product {
+      border-top: 1px solid #383838; padding: 14px 0;
+      overflow-wrap: anywhere;
+    }
+    .product strong { font-size: 17px; }
+    .muted { color: #aaa; font-size: 14px; }
+    #status { white-space: pre-wrap; color: var(--lime); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>KS<span>KO</span> SHOP</h1>
+  <p class="muted">Administration privée · Gestion des articles</p>
+  <p id="status" role="status">Connexion à Supabase…</p>
+
+  <section id="login" class="panel" hidden>
+    <h2>Connexion administrateur</h2>
+    <form id="loginForm">
+      <label for="email">Adresse e-mail</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password"
+             autocomplete="current-password" required>
+      <button type="submit">Se connecter</button>
+    </form>
+  </section>
+
+  <section id="dashboard" hidden>
+    <div class="panel">
+      <h2 id="formTitle">Ajouter un article</h2>
+      <form id="productForm">
+        <label for="name">Nom de l’article *</label>
+        <input id="name" maxlength="120" required>
+
+        <label for="price">Prix en euros *</label>
+        <input id="price" type="number" min="0" max="999999"
+               step="0.01" required>
+
+        <label for="size">Taille</label>
+        <input id="size" maxlength="30" placeholder="Ex. M, L, 42">
+
+        <label for="condition">État</label>
+        <input id="condition" maxlength="60"
+               placeholder="Ex. Très bon état">
+
+        <label for="description">Description</label>
+        <textarea id="description" rows="3" maxlength="2000"></textarea>
+
+        <label for="image_url">Lien HTTPS de la photo</label>
+        <input id="image_url" type="url" placeholder="https://...">
+
+        <label for="vinted_url">Lien de l’annonce Vinted *</label>
+        <input id="vinted_url" type="url"
+               placeholder="https://www.vinted.fr/..." required>
+
+        <button id="saveButton" type="submit">Ajouter l’article</button>
+        <button id="cancelButton" type="button" class="secondary" hidden>
+          Annuler la modification
+        </button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Mes articles</h2>
+      <div id="products"></div>
+    </div>
+
+    <button id="logoutButton" class="secondary">Se déconnecter</button>
+  </section>
+
+  <p><a href="./index.html" style="color:#d7ff3f">← Retour à la boutique</a></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Ces deux valeurs sont publiques. La sécurité repose sur RLS
+  // et sur la vérification de l'identité côté Supabase.
+  const SUPABASE_URL = "https://csoxnglijidvbxgipfrp.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_uEffqBfs4vhslcTCv8A48w_iEu8iaqe";
+
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const $ = id => document.getElementById(id);
+  let editingId = null;
+
+  function message(text) {
+    $("status").textContent = text;
+  }
+
+  function safeText(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;",
+      '"': "&quot;", "'": "&#39;"
+    })[char]);
+  }
+
+  function showLogin() {
+    $("login").hidden = false;
+    $("dashboard").hidden = true;
+  }
+
+  function showDashboard() {
+    $("login").hidden = true;
+    $("dashboard").hidden = false;
+  }
+
+  async function checkSession() {
+    const { data, error } = await db.auth.getSession();
+    if (error) {
+      message("Erreur de connexion : " + error.message);
+      showLogin();
+      return;
+    }
+    if (data.session) {
+      showDashboard();
+      await loadProducts();
+    } else {
+      showLogin();
+      message("Connecte-toi avec ton compte administrateur.");
+    }
+  }
+
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    message("Connexion en cours…");
+
+    const { error } = await db.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+
+    $("password").value = "";
+
+    if (error) {
+      message("Connexion impossible. Vérifie ton e-mail et ton mot de passe.");
+      return;
+    }
+
+    showDashboard();
+    await loadProducts();
+  });
+
+  function resetForm() {
+    editingId = null;
+    $("productForm").reset();
+    $("formTitle").textContent = "Ajouter un article";
+    $("saveButton").textContent = "Ajouter l’article";
+    $("cancelButton").hidden = true;
+  }
+
+  $("cancelButton").addEventListener("click", resetForm);
+
+  $("productForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const vinted = $("vinted_url").value.trim();
+    const image = $("image_url").value.trim();
+
+    try {
+      const vintedURL = new URL(vinted);
+      if (vintedURL.protocol !== "https:" ||
+          vintedURL.hostname !== "www.vinted.fr") {
+        throw new Error("Le lien doit être une URL HTTPS de www.vinted.fr.");
+      }
+      if (image) {
+        const imageURL = new URL(image);
+        if (imageURL.protocol !== "https:") {
+          throw new Error("Le lien de la photo doit utiliser HTTPS.");
+        }
+      }
+    } catch (error) {
+      message(error.message || "Vérifie les liens saisis.");
+      return;
+    }
+
+    const item = {
+      name: $("name").value.trim(),
+      price: Number($("price").value),
+      size: $("size").value.trim(),
+      condition: $("condition").value.trim(),
+      description: $("description").value.trim(),
+      image_url: image,
+      vinted_url: vinted
+    };
+
+    if (!item.name || !Number.isFinite(item.price) || item.price < 0) {
+      message("Vérifie le nom et le prix.");
+      return;
+    }
+
+    $("saveButton").disabled = true;
+    message("Enregistrement…");
+
+    let result;
+    if (editingId) {
+      result = await db.from("products")
+        .update({ ...item, updated_at: new Date().toISOString() })
+        .eq("id", editingId);
+    } else {
+      result = await db.from("products").insert(item);
+    }
+
+    $("saveButton").disabled = false;
+
+    if (result.error) {
+      message("Erreur : " + result.error.message);
+      return;
+    }
+
+    resetForm();
+    message("Article enregistré !");
+    await loadProducts();
+  });
+
+  async function loadProducts() {
+    const { data, error } = await db.from("products")
+      .select("*").order("created_at", { ascending: false });
+
+    if (error) {
+      $("products").textContent = "";
+      message("Impossible de charger les articles : " + error.message);
+      return;
+    }
+
+    $("products").innerHTML = "";
+
+    if (!data.length) {
+      $("products").textContent = "Aucun article pour le moment.";
+      return;
+    }
+
+    data.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <strong>${safeText(item.name)}</strong>
+        <p>${Number(item.price).toFixed(2)} € ·
+          Taille : ${safeText(item.size || "Non précisée")}</p>
+        <p class="muted">${safeText(item.condition || "")}</p>
+        <button class="secondary" data-edit="${safeText(item.id)}">
+          Modifier
+        </button>
+        <button class="danger" data-delete="${safeText(item.id)}">
+          Supprimer
+        </button>
+      `;
+      $("products").appendChild(div);
+
+      div.querySelector("[data-edit]").addEventListener("click", () => {
+        editingId = item.id;
+        $("name").value = item.name || "";
+        $("price").value = item.price;
+        $("size").value = item.size || "";
+        $("condition").value = item.condition || "";
+        $("description").value = item.description || "";
+        $("image_url").value = item.image_url || "";
+        $("vinted_url").value = item.vinted_url || "";
+        $("formTitle").textContent = "Modifier l’article";
+        $("saveButton").textContent = "Enregistrer les changements";
+        $("cancelButton").hidden = false;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      div.querySelector("[data-delete]").addEventListener("click", async () => {
+        if (!confirm("Supprimer « " + item.name + " » ?")) return;
+
+        const { error: deleteError } = await db.from("products")
+          .delete().eq("id", item.id);
+
+        if (deleteError) {
+          message("Suppression impossible : " + deleteError.message);
+          return;
+        }
+
+        message("Article supprimé.");
+        await loadProducts();
+      });
+    });
+  }
+
+  $("logoutButton").addEventListener("click", async () => {
+    await db.auth.signOut();
+    resetForm();
+    showLogin();
+    message("Tu es déconnecté.");
+  });
+
+  db.auth.onAuthStateChange((_event, session) => {
+    if (!session) {
+      showLogin();
+    }
+  });
+
+  checkSession();
+</script>
+</body>
+</html>
