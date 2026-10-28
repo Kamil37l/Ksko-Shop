@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,529 +6,82 @@
   <meta name="theme-color" content="#101010">
   <meta name="description" content="Ksko Shop : découvre notre sélection streetwear, sneakers et accessoires.">
   <title>Ksko Shop — Streetwear</title>
-
   <style>
-    :root {
-      --bg: #101010;
-      --panel: #181818;
-      --panel2: #202020;
-      --text: #f5f5f5;
-      --muted: #a4a4a4;
-      --lime: #d7ff3f;
-      --border: #303030;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.5;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button, input {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .container {
-      width: min(1160px, 92%);
-      margin: auto;
-    }
-
-    header {
-      border-bottom: 1px solid var(--border);
-      background: #101010;
-    }
-
-    .navbar {
-      min-height: 76px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .logo {
-      font-size: 27px;
-      font-weight: 900;
-      letter-spacing: -1.5px;
-    }
-
-    .logo span {
-      color: var(--lime);
-    }
-
-    .navlinks {
-      display: flex;
-      gap: 25px;
-      align-items: center;
-      color: #dedede;
-      font-size: 14px;
-    }
-
-    .navlinks a:hover {
-      color: var(--lime);
-    }
-
-    .hero {
-      min-height: 390px;
-      padding: 75px 0;
-      display: flex;
-      align-items: center;
-      background:
-        radial-gradient(ellipse at 80% 45%, #343c1d 0%, transparent 45%),
-        linear-gradient(125deg, #151515, #101010 65%);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .hero-content {
-      max-width: 720px;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      color: var(--lime);
-      border: 1px solid #566526;
-      background: #252c14;
-      border-radius: 30px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: clamp(42px, 7vw, 76px);
-      line-height: 0.98;
-      letter-spacing: -3px;
-      font-weight: 900;
-      margin-bottom: 22px;
-    }
-
-    h1 span {
-      color: var(--lime);
-    }
-
-    .hero p {
-      color: #c0c0c0;
-      max-width: 500px;
-      margin-bottom: 28px;
-    }
-
-    .button {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12px 18px;
-      border: 1px solid var(--lime);
-      border-radius: 8px;
-      background: var(--lime);
-      color: #111;
-      font-weight: 800;
-      transition: 0.2s;
-    }
-
-    .button:hover {
-      transform: translateY(-2px);
-      background: #e5ff83;
-    }
-
-    .button.secondary {
-      background: transparent;
-      color: var(--lime);
-    }
-
-    .button.secondary:hover {
-      background: #252c14;
-    }
-
-    .shop {
-      padding: 65px 0 75px;
-    }
-
-    .section-heading {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 25px;
-    }
-
-    .section-heading h2,
-    .about h2 {
-      font-size: clamp(27px, 4vw, 38px);
-      letter-spacing: -1px;
-    }
-
-    .section-heading p,
-    .muted {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .searchbar {
-      margin-bottom: 20px;
-    }
-
-    .searchbar input {
-      width: 100%;
-      padding: 14px 16px;
-      color: white;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      outline: none;
-    }
-
-    .searchbar input:focus {
-      border-color: var(--lime);
-    }
-
-    .filters {
-      display: flex;
-      gap: 9px;
-      flex-wrap: wrap;
-      margin-bottom: 28px;
-    }
-
-    .filter {
-      padding: 9px 15px;
-      border-radius: 30px;
-      border: 1px solid var(--border);
-      color: #dedede;
-      background: var(--panel);
-    }
-
-    .filter:hover,
-    .filter.active {
-      background: var(--lime);
-      border-color: var(--lime);
-      color: #111;
-      font-weight: 800;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 22px;
-    }
-
-    .card {
-      min-width: 0;
-      overflow: hidden;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: #626d39;
-    }
-
-    .productimg {
-      height: 300px;
-      position: relative;
-      overflow: hidden;
-      background: #242424;
-    }
-
-    .product-photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #747474;
-      font-size: 48px;
-      font-weight: 900;
-      letter-spacing: -3px;
-    }
-
-    .photo-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 3;
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      background: var(--lime);
-      color: #111;
-      font-size: 23px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .photo-arrow.prev {
-      left: 9px;
-    }
-
-    .photo-arrow.next {
-      right: 9px;
-    }
-
-    .photo-count {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      z-index: 3;
-      background: #101010dd;
-      color: white;
-      padding: 4px 9px;
-      border-radius: 6px;
-      font-size: 12px;
-    }
-
-    .tag {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      z-index: 2;
-      padding: 5px 9px;
-      border-radius: 5px;
-      background: var(--lime);
-      color: #111;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .cardbody {
-      padding: 17px;
-    }
-
-    .cardbody h3 {
-      font-size: 18px;
-      margin-bottom: 7px;
-      overflow-wrap: anywhere;
-    }
-
-    .description {
-      color: #bdbdbd;
-      font-size: 13px;
-      min-height: 38px;
-      margin-bottom: 12px;
-      white-space: pre-line;
-      overflow-wrap: anywhere;
-    }
-
-    .details {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-bottom: 15px;
-    }
-
-    .detail {
-      background: var(--panel2);
-      color: #d0d0d0;
-      border-radius: 5px;
-      padding: 4px 8px;
-      font-size: 11px;
-    }
-
-    .cardbottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding-top: 13px;
-      border-top: 1px solid var(--border);
-    }
-
-    .price {
-      color: var(--lime);
-      font-size: 23px;
-      font-weight: 900;
-      white-space: nowrap;
-    }
-
-    .buybutton {
-      display: inline-block;
-      text-align: center;
-      background: var(--lime);
-      color: #111;
-      border-radius: 7px;
-      padding: 10px 12px;
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-    .buybutton:hover {
-      background: #e5ff83;
-    }
-
-    .empty {
-      grid-column: 1 / -1;
-      padding: 45px 20px;
-      border: 1px dashed #444;
-      border-radius: 12px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .empty h3 {
-      color: white;
-      margin-bottom: 8px;
-    }
-
-    .about {
-      padding: 55px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: #151515;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-top: 28px;
-    }
-
-    .about-item {
-      padding: 22px;
-      border-radius: 10px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-    }
-
-    .about-item strong {
-      display: block;
-      margin-bottom: 7px;
-      color: var(--lime);
-    }
-
-    .about-item p {
-      color: #bdbdbd;
-      font-size: 14px;
-    }
-
-    .admin-link {
-      margin-top: 25px;
-    }
-
-    footer {
-      padding: 28px 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-
-    .footer-logo {
-      color: white;
-      font-weight: 900;
-      font-size: 18px;
-    }
-
-    .footer-logo span {
-      color: var(--lime);
-    }
-
-    @media (max-width: 850px) {
-      .product-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .productimg {
-        height: 260px;
-      }
-
-      .about-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .navbar {
-        min-height: 66px;
-      }
-
-      .logo {
-        font-size: 23px;
-      }
-
-      .navlinks {
-        gap: 13px;
-        font-size: 12px;
-      }
-
-      .hero {
-        min-height: 340px;
-        padding: 55px 0;
-      }
-
-      h1 {
-        letter-spacing: -2px;
-      }
-
-      .shop {
-        padding: 45px 0;
-      }
-
-      .section-heading {
-        align-items: start;
-        flex-direction: column;
-      }
-
-      .product-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .productimg {
-        height: 330px;
-      }
-    }
+    :root { --bg:#101010; --panel:#181818; --panel2:#202020; --text:#f5f5f5; --muted:#a4a4a4; --lime:#d7ff3f; --border:#303030; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body { background:var(--bg); color:var(--text); font-family:Arial,Helvetica,sans-serif; line-height:1.5; }
+    a { color:inherit; text-decoration:none; }
+    button,input { font:inherit; }
+    button { cursor:pointer; }
+    .container { width:min(1160px,92%); margin:auto; }
+    header { border-bottom:1px solid var(--border); background:#101010; }
+    .navbar { min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .logo { font-size:27px; font-weight:900; letter-spacing:-1.5px; }
+    .logo span,.footer-logo span { color:var(--lime); }
+    .navlinks { display:flex; gap:25px; align-items:center; color:#dedede; font-size:14px; }
+    .navlinks a:hover { color:var(--lime); }
+    .hero { min-height:390px; padding:75px 0; display:flex; align-items:center; background:radial-gradient(ellipse at 80% 45%,#343c1d 0%,transparent 45%),linear-gradient(125deg,#151515,#101010 65%); border-bottom:1px solid var(--border); }
+    .hero-content { max-width:720px; }
+    .eyebrow { display:inline-block; color:var(--lime); border:1px solid #566526; background:#252c14; border-radius:30px; padding:6px 12px; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:20px; }
+    h1 { font-size:clamp(42px,7vw,76px); line-height:.98; letter-spacing:-3px; font-weight:900; margin-bottom:22px; }
+    h1 span { color:var(--lime); }
+    .hero p { color:#c0c0c0; max-width:500px; margin-bottom:28px; }
+    .button { display:inline-flex; justify-content:center; align-items:center; padding:12px 18px; border:1px solid var(--lime); border-radius:8px; background:var(--lime); color:#111; font-weight:800; transition:.2s; }
+    .button:hover { transform:translateY(-2px); background:#e5ff83; }
+    .button.secondary { background:transparent; color:var(--lime); }
+    .button.secondary:hover { background:#252c14; }
+    .shop { padding:65px 0 75px; }
+    .section-heading { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:25px; }
+    .section-heading h2,.about h2 { font-size:clamp(27px,4vw,38px); letter-spacing:-1px; }
+    .section-heading p,.muted { color:var(--muted); font-size:14px; }
+    .searchbar { margin-bottom:20px; }
+    .searchbar input { width:100%; padding:14px 16px; color:white; background:var(--panel); border:1px solid var(--border); border-radius:9px; outline:none; }
+    .searchbar input:focus { border-color:var(--lime); }
+    .filters { display:flex; gap:9px; flex-wrap:wrap; margin-bottom:28px; }
+    .filter { padding:9px 15px; border-radius:30px; border:1px solid var(--border); color:#dedede; background:var(--panel); }
+    .filter:hover,.filter.active { background:var(--lime); border-color:var(--lime); color:#111; font-weight:800; }
+    .product-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
+    .card { min-width:0; overflow:hidden; background:var(--panel); border:1px solid var(--border); border-radius:13px; transition:transform .2s,border-color .2s; }
+    .card:hover { transform:translateY(-4px); border-color:#626d39; }
+    .productimg { height:300px; position:relative; overflow:hidden; background:#242424; }
+    .product-photo { width:100%; height:100%; object-fit:cover; display:block; }
+    .placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#747474; font-size:48px; font-weight:900; letter-spacing:-3px; }
+    .photo-arrow { position:absolute; top:50%; transform:translateY(-50%); z-index:3; border:none; border-radius:50%; width:35px; height:35px; background:var(--lime); color:#111; font-size:23px; display:flex; align-items:center; justify-content:center; }
+    .photo-arrow.prev { left:9px; } .photo-arrow.next { right:9px; }
+    .photo-count { position:absolute; bottom:10px; right:10px; z-index:3; background:#101010dd; color:white; padding:4px 9px; border-radius:6px; font-size:12px; }
+    .tag { position:absolute; top:12px; left:12px; z-index:2; padding:5px 9px; border-radius:5px; background:var(--lime); color:#111; font-size:11px; font-weight:900; text-transform:uppercase; }
+    .cardbody { padding:17px; }
+    .cardbody h3 { font-size:18px; margin-bottom:7px; overflow-wrap:anywhere; }
+    .description { color:#bdbdbd; font-size:13px; min-height:38px; margin-bottom:12px; white-space:pre-line; overflow-wrap:anywhere; }
+    .details { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:15px; }
+    .detail { background:var(--panel2); color:#d0d0d0; border-radius:5px; padding:4px 8px; font-size:11px; }
+    .detail.stock-out { background:#402020; color:#ffb3b3; }
+    .cardbottom { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:13px; border-top:1px solid var(--border); }
+    .price { color:var(--lime); font-size:23px; font-weight:900; white-space:nowrap; }
+    .buybutton { display:inline-block; text-align:center; background:var(--lime); color:#111; border-radius:7px; padding:10px 12px; font-size:13px; font-weight:900; }
+    .buybutton:hover { background:#e5ff83; }
+    .buybutton.disabled { background:#454545; color:#aaa; cursor:not-allowed; }
+    .empty { grid-column:1/-1; padding:45px 20px; border:1px dashed #444; border-radius:12px; text-align:center; color:var(--muted); }
+    .empty h3 { color:white; margin-bottom:8px; }
+    .about { padding:55px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:#151515; }
+    .about-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:28px; }
+    .about-item { padding:22px; border-radius:10px; background:var(--panel); border:1px solid var(--border); }
+    .about-item strong { display:block; margin-bottom:7px; color:var(--lime); }
+    .about-item p { color:#bdbdbd; font-size:14px; }
+    .admin-link { margin-top:25px; }
+    footer { padding:28px 0; color:var(--muted); font-size:13px; }
+    .footer-inner { display:flex; justify-content:space-between; align-items:center; gap:15px; flex-wrap:wrap; }
+    .footer-logo { color:white; font-weight:900; font-size:18px; }
+    @media(max-width:850px) { .product-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .productimg { height:260px; } .about-grid { grid-template-columns:1fr; } }
+    @media(max-width:560px) { .navbar { min-height:66px; } .logo { font-size:23px; } .navlinks { gap:13px; font-size:12px; } .hero { min-height:340px; padding:55px 0; } h1 { letter-spacing:-2px; } .shop { padding:45px 0; } .section-heading { align-items:start; flex-direction:column; } .product-grid { grid-template-columns:1fr; } .productimg { height:330px; } }
   </style>
 </head>
-
 <body>
   <header>
     <div class="container navbar">
       <a class="logo" href="#accueil">KSKO<span>.</span>SHOP</a>
-
-      <nav class="navlinks">
-        <a href="#articles">Articles</a>
-        <a href="#concept">Le concept</a>
-      </nav>
+      <nav class="navlinks"><a href="#articles">Articles</a><a href="#concept">Le concept</a></nav>
     </div>
   </header>
 
@@ -538,191 +90,91 @@
       <div class="container hero-content">
         <span class="eyebrow">Streetwear selection</span>
         <h1>TON STYLE.<br><span>TON PRIX.</span></h1>
-        <p>
-          Découvre notre sélection de vêtements, sneakers et accessoires.
-          Trouve ta prochaine pièce et commande directement sur Vinted.
-        </p>
+        <p>Découvre notre sélection de vêtements, sneakers et accessoires. Trouve ta prochaine pièce et commande directement sur Vinted.</p>
         <a class="button" href="#articles">Découvrir les articles ↗</a>
       </div>
     </section>
 
     <section class="shop container" id="articles">
       <div class="section-heading">
-        <div>
-          <h2>La sélection</h2>
-          <p>Les pièces disponibles chez Ksko Shop.</p>
-        </div>
+        <div><h2>La sélection</h2><p>Les pièces disponibles chez Ksko Shop.</p></div>
         <p id="product-count">Chargement…</p>
       </div>
-
-      <div class="searchbar">
-        <input
-          id="search"
-          type="search"
-          placeholder="Rechercher un article..."
-          aria-label="Rechercher un article"
-        >
-      </div>
-
+      <div class="searchbar"><input id="search" type="search" placeholder="Rechercher un article..." aria-label="Rechercher un article"></div>
       <div class="filters" aria-label="Catégories">
         <button class="filter active" data-category="Tout">Tout</button>
         <button class="filter" data-category="Vêtements">Vêtements</button>
         <button class="filter" data-category="Sneakers">Sneakers</button>
         <button class="filter" data-category="Accessoires">Accessoires</button>
       </div>
-
       <div class="product-grid" id="products">
-        <div class="empty">
-          <h3>Chargement des articles…</h3>
-          <p>La sélection arrive.</p>
-        </div>
+        <div class="empty"><h3>Chargement des articles…</h3><p>La sélection arrive.</p></div>
       </div>
     </section>
 
     <section class="about" id="concept">
       <div class="container">
         <h2>Le concept Ksko Shop</h2>
-        <p class="muted">
-          Une sélection streetwear, simple et accessible.
-        </p>
-
+        <p class="muted">Une sélection streetwear, simple et accessible.</p>
         <div class="about-grid">
-          <div class="about-item">
-            <strong>01 — La sélection</strong>
-            <p>Des vêtements, sneakers et accessoires présentés au même endroit.</p>
-          </div>
-
-          <div class="about-item">
-            <strong>02 — Les détails</strong>
-            <p>Consulte les photos, la taille, l’état et le prix de chaque pièce.</p>
-          </div>
-
-          <div class="about-item">
-            <strong>03 — Achat sur Vinted</strong>
-            <p>Le bouton d’achat t’envoie vers l’annonce Vinted correspondante.</p>
-          </div>
+          <div class="about-item"><strong>01 — La sélection</strong><p>Des vêtements, sneakers et accessoires présentés au même endroit.</p></div>
+          <div class="about-item"><strong>02 — Les détails</strong><p>Consulte les photos, la taille, l’état, le prix et le stock de chaque pièce.</p></div>
+          <div class="about-item"><strong>03 — Achat sur Vinted</strong><p>Le bouton d’achat t’envoie vers l’annonce Vinted correspondante.</p></div>
         </div>
-
-        <div class="admin-link">
-          <a class="button secondary" href="./admin.html">Espace administration ↗</a>
-        </div>
+        <div class="admin-link"><a class="button secondary" href="./admin.html">Espace administration ↗</a></div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="container footer-inner">
-      <div class="footer-logo">KSKO<span>.</span>SHOP</div>
-      <p>Ksko Shop — Streetwear selection</p>
-    </div>
-  </footer>
+  <footer><div class="container footer-inner"><div class="footer-logo">KSKO<span>.</span>SHOP</div><p>Ksko Shop — Streetwear selection</p></div></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
     const SUPABASE_URL = "https://csoxnglijidvbxgipfrp.supabase.co";
     const SUPABASE_KEY = "sb_publishable_uEffqBfs4vhslcTCv8A48w_iEu8iaqe";
-
-    const db = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
-
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const productsRoot = document.getElementById("products");
     const searchInput = document.getElementById("search");
     const productCount = document.getElementById("product-count");
     const filterButtons = [...document.querySelectorAll(".filter")];
-
     let allProducts = [];
     let selectedCategory = "Tout";
 
-    function guessCategory(name) {
-      const value = (name || "").toLowerCase();
-
-      if (
-        /sneaker|basket|chaussure|air max|air force|jordan|dunk|tn\b|yeezy|new balance|adidas samba|asics/.test(value)
-      ) {
-        return "Sneakers";
-      }
-
-      if (
-        /sac|casquette|bonnet|ceinture|lunette|lunettes|bijou|montre|porte.?clé|accessoire|portefeuille|collier|bracelet/.test(value)
-      ) {
-        return "Accessoires";
-      }
-
-      return "Vêtements";
-    }
-
-    function cleanText(value) {
-      return String(value ?? "").trim();
-    }
-
+    function cleanText(value) { return String(value ?? "").trim(); }
     function validImage(value) {
-      try {
-        const url = new URL(value);
-        return url.protocol === "https:";
-      } catch {
-        return false;
-      }
+      try { const url = new URL(value); return url.protocol === "https:"; }
+      catch { return false; }
     }
-
     function getPhotos(product) {
-      let photos = [];
-
-      if (Array.isArray(product.image_urls)) {
-        photos = product.image_urls;
-      }
-
-      if (photos.length === 0 && product.image_url) {
-        photos = [product.image_url];
-      }
-
-      return [...new Set(
-        photos.filter(url => typeof url === "string" && validImage(url))
-      )].slice(0, 6);
+      let photos = Array.isArray(product.image_urls) ? product.image_urls : [];
+      if (photos.length === 0 && product.image_url) photos = [product.image_url];
+      return [...new Set(photos.filter(url => typeof url === "string" && validImage(url)))]
+        .slice(0, 6);
     }
-
     function formatPrice(value) {
       const price = Number(value);
-
-      if (!Number.isFinite(price)) {
-        return "Prix indisponible";
-      }
-
-      return price.toLocaleString("fr-FR", {
-        style: "currency",
-        currency: "EUR"
-      });
+      if (!Number.isFinite(price)) return "Prix indisponible";
+      return price.toLocaleString("fr-FR", { style:"currency", currency:"EUR" });
     }
-
     function showMessage(title, message) {
       productsRoot.replaceChildren();
-
       const box = document.createElement("div");
       box.className = "empty";
-
       const heading = document.createElement("h3");
       heading.textContent = title;
-
       const paragraph = document.createElement("p");
       paragraph.textContent = message;
-
       box.append(heading, paragraph);
       productsRoot.append(box);
     }
-
-    function makePhotoArea(product, index) {
+    function makePhotoArea(product) {
       const area = document.createElement("div");
       area.className = "productimg";
-
       const photos = getPhotos(product);
-
       const tag = document.createElement("span");
       tag.className = "tag";
-      tag.textContent = product.category;
+      tag.textContent = product.category || "Vêtements";
       area.append(tag);
-
       if (photos.length === 0) {
         const placeholder = document.createElement("div");
         placeholder.className = "placeholder";
@@ -730,26 +182,20 @@
         area.append(placeholder);
         return area;
       }
-
       let photoIndex = 0;
-
       const img = document.createElement("img");
       img.className = "product-photo";
-      img.alt = product.name;
+      img.alt = product.name || "Article Ksko Shop";
       img.loading = "lazy";
-
-      function updatePhoto() {
-        img.src = photos[photoIndex];
-        img.alt = product.name + " — photo " + (photoIndex + 1);
-        count.textContent = (photoIndex + 1) + " / " + photos.length;
-      }
-
       const count = document.createElement("span");
       count.className = "photo-count";
-
+      function updatePhoto() {
+        img.src = photos[photoIndex];
+        img.alt = (product.name || "Article Ksko Shop") + " — photo " + (photoIndex + 1);
+        count.textContent = (photoIndex + 1) + " / " + photos.length;
+      }
       img.addEventListener("error", () => {
         img.hidden = true;
-
         if (!area.querySelector(".placeholder")) {
           const placeholder = document.createElement("div");
           placeholder.className = "placeholder";
@@ -757,129 +203,92 @@
           area.append(placeholder);
         }
       });
-
       area.append(img);
-
       if (photos.length > 1) {
         const previous = document.createElement("button");
-        previous.type = "button";
-        previous.className = "photo-arrow prev";
-        previous.textContent = "‹";
+        previous.type = "button"; previous.className = "photo-arrow prev"; previous.textContent = "‹";
         previous.setAttribute("aria-label", "Photo précédente");
-
         previous.addEventListener("click", () => {
           photoIndex = (photoIndex - 1 + photos.length) % photos.length;
-          img.hidden = false;
-          updatePhoto();
+          img.hidden = false; updatePhoto();
         });
-
         const next = document.createElement("button");
-        next.type = "button";
-        next.className = "photo-arrow next";
-        next.textContent = "›";
+        next.type = "button"; next.className = "photo-arrow next"; next.textContent = "›";
         next.setAttribute("aria-label", "Photo suivante");
-
         next.addEventListener("click", () => {
           photoIndex = (photoIndex + 1) % photos.length;
-          img.hidden = false;
-          updatePhoto();
+          img.hidden = false; updatePhoto();
         });
-
         area.append(previous, next, count);
       }
-
       updatePhoto();
       return area;
     }
-
-    function makeProductCard(product, index) {
+    function makeProductCard(product) {
       const card = document.createElement("article");
       card.className = "card";
-
-      card.append(makePhotoArea(product, index));
-
+      card.append(makePhotoArea(product));
       const body = document.createElement("div");
       body.className = "cardbody";
-
       const title = document.createElement("h3");
       title.textContent = product.name || "Article Ksko Shop";
-
       const description = document.createElement("p");
       description.className = "description";
       description.textContent = product.description || "Découvre les détails de cet article.";
-
       const details = document.createElement("div");
       details.className = "details";
-
       if (product.size) {
         const size = document.createElement("span");
-        size.className = "detail";
-        size.textContent = "Taille : " + product.size;
+        size.className = "detail"; size.textContent = "Taille : " + product.size;
         details.append(size);
       }
-
       if (product.condition) {
         const condition = document.createElement("span");
-        condition.className = "detail";
-        condition.textContent = product.condition;
+        condition.className = "detail"; condition.textContent = product.condition;
         details.append(condition);
       }
+      const quantity = Number.isFinite(Number(product.quantity)) ? Math.max(0, Number(product.quantity)) : 1;
+      const stock = document.createElement("span");
+      stock.className = "detail" + (quantity === 0 ? " stock-out" : "");
+      stock.textContent = quantity === 0 ? "Épuisé" : "Stock : " + quantity;
+      details.append(stock);
 
       const bottom = document.createElement("div");
       bottom.className = "cardbottom";
-
       const price = document.createElement("span");
-      price.className = "price";
-      price.textContent = formatPrice(product.price);
-
+      price.className = "price"; price.textContent = formatPrice(product.price);
       bottom.append(price);
-
-      if (product.vinted_url) {
+      if (quantity === 0) {
+        const unavailable = document.createElement("span");
+        unavailable.className = "buybutton disabled";
+        unavailable.textContent = "Épuisé";
+        bottom.append(unavailable);
+      } else if (product.vinted_url) {
         const link = document.createElement("a");
-        link.className = "buybutton";
-        link.href = product.vinted_url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
+        link.className = "buybutton"; link.href = product.vinted_url;
+        link.target = "_blank"; link.rel = "noopener noreferrer";
         link.textContent = "Voir sur Vinted ↗";
         bottom.append(link);
       } else {
         const unavailable = document.createElement("span");
-        unavailable.className = "detail";
-        unavailable.textContent = "Lien indisponible";
+        unavailable.className = "detail"; unavailable.textContent = "Lien indisponible";
         bottom.append(unavailable);
       }
-
       body.append(title, description, details, bottom);
       card.append(body);
-
       return card;
     }
-
     function renderProducts() {
       const query = searchInput.value.trim().toLowerCase();
-
       const filtered = allProducts.filter(product => {
-        const searchable = [
-          product.name,
-          product.description,
-          product.size,
-          product.condition,
-          product.category
-        ].join(" ").toLowerCase();
-
+        const searchable = [product.name, product.description, product.size, product.condition, product.category]
+          .join(" ").toLowerCase();
         const matchesSearch = searchable.includes(query);
-        const matchesCategory =
-          selectedCategory === "Tout" ||
-          product.category === selectedCategory;
-
+        const matchesCategory = selectedCategory === "Tout" || product.category === selectedCategory;
         return matchesSearch && matchesCategory;
       });
-
-      productCount.textContent =
-        filtered.length + (filtered.length > 1 ? " articles" : " article");
-
+      productCount.textContent = filtered.length + (filtered.length > 1 ? " articles" : " article");
       productsRoot.replaceChildren();
-
       if (filtered.length === 0) {
         showMessage(
           allProducts.length === 0 ? "Aucun article pour le moment" : "Aucun résultat",
@@ -887,58 +296,36 @@
             ? "Les articles ajoutés depuis l’administration apparaîtront ici."
             : "Essaie un autre mot-clé ou une autre catégorie."
         );
-
         productCount.textContent = "0 article";
         return;
       }
-
-      filtered.forEach((product, index) => {
-        productsRoot.append(makeProductCard(product, index));
-      });
+      filtered.forEach(product => productsRoot.append(makeProductCard(product)));
     }
-
     async function loadProducts() {
       showMessage("Chargement des articles…", "Connexion à la sélection Ksko Shop.");
-
-      const { data, error } = await db
-        .from("products")
-        .select("id, name, description, price, size, condition, image_url, image_urls, vinted_url, created_at")
-        .order("created_at", { ascending: false });
-
+      const { data, error } = await db.from("products")
+        .select("id, name, description, price, size, condition, image_url, image_urls, vinted_url, category, quantity, created_at")
+        .order("created_at", { ascending:false });
       if (error) {
         console.error("Erreur Supabase :", error);
-
-        showMessage(
-          "Impossible de charger les articles",
-          "Vérifie ta connexion et les autorisations de lecture de la table products dans Supabase."
-        );
-
+        showMessage("Impossible de charger les articles", "Vérifie ta connexion et les autorisations de lecture de la table products dans Supabase.");
         productCount.textContent = "Erreur";
         return;
       }
-
       allProducts = (data || []).map(product => ({
         ...product,
-        category: guessCategory(product.name)
+        category: ["Vêtements", "Sneakers", "Accessoires"].includes(product.category)
+          ? product.category : "Vêtements",
+        quantity: Number.isFinite(Number(product.quantity)) ? Math.max(0, Number(product.quantity)) : 1
       }));
-
       renderProducts();
     }
-
     searchInput.addEventListener("input", renderProducts);
-
-    filterButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        selectedCategory = button.dataset.category;
-
-        filterButtons.forEach(item => {
-          item.classList.toggle("active", item === button);
-        });
-
-        renderProducts();
-      });
-    });
-
+    filterButtons.forEach(button => button.addEventListener("click", () => {
+      selectedCategory = button.dataset.category;
+      filterButtons.forEach(item => item.classList.toggle("active", item === button));
+      renderProducts();
+    }));
     loadProducts();
   </script>
 </body>
