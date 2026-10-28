@@ -19,12 +19,12 @@
       background: #1b1b1b; border: 1px solid #353535;
       border-radius: 16px; padding: 20px; margin: 18px 0;
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%; padding: 12px; margin: 6px 0 14px;
       background: #101010; color: white; border: 1px solid #454545;
       border-radius: 8px; font: inherit;
     }
-    label { font-size: 14px; color: #ccc; }
+    label { font-size: 14px; color: #ccc; display: block; }
     button {
       padding: 11px 15px; border: 0; border-radius: 8px;
       background: var(--lime); color: #111; font-weight: bold;
@@ -47,6 +47,7 @@
     }
     .photo-field input { margin-bottom: 0; }
     .photo-field label { display: block; }
+    .field-help { margin-top: -8px; margin-bottom: 14px; }
   </style>
 </head>
 <body>
@@ -70,13 +71,28 @@
   <section id="dashboard" hidden>
     <div class="panel">
       <h2 id="formTitle">Ajouter un article</h2>
+
       <form id="productForm">
         <label for="name">Nom de l’article *</label>
         <input id="name" maxlength="120" required>
 
+        <label for="category">Catégorie *</label>
+        <select id="category" required>
+          <option value="Vêtements">Vêtements</option>
+          <option value="Sneakers">Sneakers</option>
+          <option value="Accessoires">Accessoires</option>
+        </select>
+
         <label for="price">Prix en euros *</label>
         <input id="price" type="number" min="0" max="999999"
                step="0.01" required>
+
+        <label for="quantity">Quantité disponible *</label>
+        <input id="quantity" type="number" min="0" max="999999"
+               step="1" value="1" required>
+        <p class="muted field-help">
+          Mets 0 si l’article est épuisé.
+        </p>
 
         <label for="size">Taille</label>
         <input id="size" maxlength="30" placeholder="Ex. M, L, 42">
@@ -88,10 +104,10 @@
         <label for="description">Description</label>
         <textarea id="description" rows="3" maxlength="2000"></textarea>
 
-        <h3>Photos du vêtement (6 maximum)</h3>
+        <h3>Photos de l’article (6 maximum)</h3>
         <p class="muted">
-          Colle un lien HTTPS direct vers chaque photo.
-          Tu peux laisser les champs inutilisés vides.
+          Colle un lien HTTPS vers chaque photo. Les champs inutilisés
+          peuvent rester vides.
         </p>
 
         <div class="photo-field">
@@ -149,6 +165,8 @@
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = id => document.getElementById(id);
   const photoIds = ["image1", "image2", "image3", "image4", "image5", "image6"];
+  const categories = ["Vêtements", "Sneakers", "Accessoires"];
+
   let editingId = null;
 
   function message(text) {
@@ -213,6 +231,8 @@
   function resetForm() {
     editingId = null;
     $("productForm").reset();
+    $("category").value = "Vêtements";
+    $("quantity").value = "1";
     $("formTitle").textContent = "Ajouter un article";
     $("saveButton").textContent = "Ajouter l’article";
     $("cancelButton").hidden = true;
@@ -228,11 +248,37 @@
       .map(id => $(id).value.trim())
       .filter(Boolean);
 
+    const quantity = Number($("quantity").value);
+    const price = Number($("price").value);
+    const category = $("category").value;
+
+    if (!categories.includes(category)) {
+      message("Choisis une catégorie valide.");
+      return;
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 0 || quantity > 999999) {
+      message("La quantité doit être un nombre entier positif ou égal à 0.");
+      return;
+    }
+
+    if (!Number.isFinite(price) || price < 0 || price > 999999) {
+      message("Vérifie le prix.");
+      return;
+    }
+
+    if (!$("name").value.trim()) {
+      message("Le nom de l’article est obligatoire.");
+      return;
+    }
+
     try {
       const vintedURL = new URL(vinted);
 
-      if (vintedURL.protocol !== "https:" ||
-          vintedURL.hostname !== "www.vinted.fr") {
+      if (
+        vintedURL.protocol !== "https:" ||
+        vintedURL.hostname !== "www.vinted.fr"
+      ) {
         throw new Error("Le lien doit être une URL HTTPS de www.vinted.fr.");
       }
 
@@ -250,25 +296,16 @@
 
     const item = {
       name: $("name").value.trim(),
-      price: Number($("price").value),
+      category,
+      price,
+      quantity,
       size: $("size").value.trim(),
       condition: $("condition").value.trim(),
       description: $("description").value.trim(),
-
-      // Nouvelle colonne : toutes les photos
       image_urls: images,
-
-      // Ancienne colonne conservée pour compatibilité
       image_url: images[0] || "",
-
       vinted_url: vinted
     };
-
-    if (!item.name || !Number.isFinite(item.price) ||
-        item.price < 0 || item.price > 999999) {
-      message("Vérifie le nom et le prix.");
-      return;
-    }
 
     $("saveButton").disabled = true;
     message("Enregistrement…");
@@ -320,16 +357,21 @@
       const div = document.createElement("div");
       div.className = "product";
 
-      // Prend en compte les anciens articles avec une seule photo.
       const images = Array.isArray(item.image_urls) && item.image_urls.length
         ? item.image_urls
         : (item.image_url ? [item.image_url] : []);
 
+      const quantity = Number.isInteger(Number(item.quantity))
+        ? Number(item.quantity)
+        : 1;
+
       div.innerHTML = `
         <strong>${safeText(item.name)}</strong>
         <p>${Number(item.price).toFixed(2)} € ·
-          Taille : ${safeText(item.size || "Non précisée")}</p>
-        <p class="muted">${safeText(item.condition || "")}</p>
+          ${safeText(item.category || "Vêtements")}</p>
+        <p class="muted">Taille : ${safeText(item.size || "Non précisée")}</p>
+        <p class="muted">État : ${safeText(item.condition || "Non précisé")}</p>
+        <p class="muted">Stock : ${quantity} exemplaire(s)</p>
         <p class="muted">${images.length} photo(s) enregistrée(s)</p>
         <button class="secondary" data-edit>Modifier</button>
         <button class="danger" data-delete>Supprimer</button>
@@ -341,12 +383,15 @@
         editingId = item.id;
         $("name").value = item.name || "";
         $("price").value = item.price;
+        $("category").value = categories.includes(item.category)
+          ? item.category
+          : "Vêtements";
+        $("quantity").value = quantity;
         $("size").value = item.size || "";
         $("condition").value = item.condition || "";
         $("description").value = item.description || "";
         $("vinted_url").value = item.vinted_url || "";
 
-        // Recharge les photos existantes dans les six champs.
         photoIds.forEach((id, index) => {
           $(id).value = images[index] || "";
         });
